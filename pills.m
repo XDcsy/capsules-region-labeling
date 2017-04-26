@@ -1,5 +1,5 @@
 clear;
-img = imread('1.tiff');
+img = imread('5.tiff');
 gray = rgb2gray(img);
 bw = im2bw(img, graythresh(gray));
 bw = imfill(bw, 'holes');
@@ -35,7 +35,7 @@ while length(x) > limit
   randco = ceil(rand(1)*length(x));
   seedx = x(randco);
   seedy = y(randco);
-  J = regiongrowing(dimg,0.07,seedx,seedy);
+  J = regiongrowing(dimg,0.1,seedx,seedy);
   region = region + J(:,:,1);
   sedge = sedge - region;
   [x,y] = find(sedge == 1);
@@ -43,7 +43,7 @@ end
 region = logical(region);
 
 %对药板区域进行二值处理
-se3 = strel('disk',4);  %消除药板区域的孔洞
+se3 = strel('disk',5);  %消除药板区域的孔洞
 region = imclose(region, se3);
 se4 = strel('disk',5);  %断开药丸内部与药板的粘连
 region = imopen(region, se4);
