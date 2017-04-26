@@ -5,7 +5,7 @@ bw = im2bw(img, graythresh(gray));
 bw = imfill(bw, 'holes');
 se0 = strel('disk',5);
 bw = imopen(bw, se0);  %二值图像处理，修剪药板区域
-%imshow(bw);
+imshow(bw);
 gray = uint8(bw).*gray;  %利用二值图像剪裁灰度图像
 img = cat(3,uint8(bw).*img(:,:,1),uint8(bw).*img(:,:,2),uint8(bw).*img(:,:,3));  %利用二值图像剪裁rgb图像
 %result 1
@@ -35,7 +35,7 @@ while length(x) > limit
   randco = ceil(rand(1)*length(x));
   seedx = x(randco);
   seedy = y(randco);
-  J = regiongrowing(dimg,0.1,seedx,seedy);
+  J = regiongrowing(dimg,0.07,seedx,seedy);
   region = region + J(:,:,1);
   sedge = sedge - region;
   [x,y] = find(sedge == 1);
@@ -43,15 +43,17 @@ end
 region = logical(region);
 
 %对药板区域进行二值处理
-se3 = strel('disk',5);
+se3 = strel('disk',4);  %消除药板区域的孔洞
 region = imclose(region, se3);
-se4 = strel('disk',3);
-ebw = imerode(bw,se4);  %将二值图像腐蚀掉一些边缘像素
+se4 = strel('disk',5);  %断开药丸内部与药板的粘连
+region = imopen(region, se4);
+se5 = strel('disk',3);
+ebw = imerode(bw,se5);  %将二值图像腐蚀掉一些边缘像素
 pill = ebw - region;
 pill(pill<0) = 0;
 pill = logical(pill);
-se5 = strel('disk',3);
-pill = imerode(pill,se5);  %适当缩小最终药丸区域的大小
+se6 = strel('disk',3);
+pill = imerode(pill,se6);  %适当缩小最终药丸区域的大小
 imshow(pill);
 imshow(img);
 
