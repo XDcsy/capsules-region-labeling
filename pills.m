@@ -58,7 +58,7 @@ imshow(pill);
 imshow(img);
 
 [l,num]=bwlabel(pill,8);
-status = regionprops(l,'BoundingBox');  %%画外接矩形
+status = regionprops(l,'BoundingBox');  %画外接矩形
 hold on;
 for i = 1 : num
      rectangle('position',status(i).BoundingBox,'edgecolor','r');
