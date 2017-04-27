@@ -4,21 +4,21 @@ gray = rgb2gray(img);
 bw = im2bw(img, graythresh(gray));
 bw = imfill(bw, 'holes');
 se0 = strel('disk',5);
-bw = imopen(bw, se0);  %¶şÖµÍ¼Ïñ´¦Àí£¬ĞŞ¼ôÒ©°åÇøÓò
+bw = imopen(bw, se0);  %äºŒå€¼å›¾åƒå¤„ç†ï¼Œä¿®å‰ªè¯æ¿åŒºåŸŸ
 imshow(bw);
-gray = uint8(bw).*gray;  %ÀûÓÃ¶şÖµÍ¼Ïñ¼ô²Ã»Ò¶ÈÍ¼Ïñ
-img = cat(3,uint8(bw).*img(:,:,1),uint8(bw).*img(:,:,2),uint8(bw).*img(:,:,3));  %ÀûÓÃ¶şÖµÍ¼Ïñ¼ô²ÃrgbÍ¼Ïñ
+gray = uint8(bw).*gray;  %åˆ©ç”¨äºŒå€¼å›¾åƒå‰ªè£ç°åº¦å›¾åƒ
+img = cat(3,uint8(bw).*img(:,:,1),uint8(bw).*img(:,:,2),uint8(bw).*img(:,:,3));  %åˆ©ç”¨äºŒå€¼å›¾åƒå‰ªè£rgbå›¾åƒ
 %result 1
 e = edge(bw,'canny');
 theta = 1:180;
 [R,xp] = radon(e,theta);
-[I,J] = find(R>=max(max(R)));%J¼ÇÂ¼ÁËÇãĞ±½Ç£¬×î´óµÄÇãĞ±½Ç
+[I,J] = find(R>=max(max(R)));%Jè®°å½•äº†å€¾æ–œè§’ï¼Œæœ€å¤§çš„å€¾æ–œè§’
 angle=90-J;
 bw = imrotate(bw,angle,'bicubic','crop');
 gray = imrotate(gray,angle,'bicubic','crop');
 img = imrotate(img,angle,'bicubic','crop');
 e = imrotate(e,angle,'bicubic','crop');
-%Ğı×ª¶şÖµ¡¢»Ò¶È¡¢²ÊÉ«Í¼ÏñºÍ±ßÔµ
+%æ—‹è½¬äºŒå€¼ã€ç°åº¦ã€å½©è‰²å›¾åƒå’Œè¾¹ç¼˜
 
 se1 = strel('disk',6);
 se2 = strel('disk',2);
@@ -29,8 +29,8 @@ sedge = imerode(sedge,se2);
 dimg = im2double(img);
 
 [x,y] = find(sedge == 1);
-region = zeros(size(gray));  %region:Ò©°åÇøÓò
-limit = length(x) * 0.03;  %×îÖÕÊ£ÓàµãËùÕ¼°Ù·Ö±È
+region = zeros(size(gray));  %region:è¯æ¿åŒºåŸŸ
+limit = length(x) * 0.03;  %æœ€ç»ˆå‰©ä½™ç‚¹æ‰€å ç™¾åˆ†æ¯”
 while length(x) > limit
   randco = ceil(rand(1)*length(x));
   seedx = x(randco);
@@ -42,25 +42,35 @@ while length(x) > limit
 end
 region = logical(region);
 
-%¶ÔÒ©°åÇøÓò½øĞĞ¶şÖµ´¦Àí
-se3 = strel('disk',5);  %Ïû³ıÒ©°åÇøÓòµÄ¿×¶´
+%å¯¹è¯æ¿åŒºåŸŸè¿›è¡ŒäºŒå€¼å¤„ç†
+se3 = strel('disk',5);  %æ¶ˆé™¤è¯æ¿åŒºåŸŸçš„å­”æ´
 region = imclose(region, se3);
-se4 = strel('disk',5);  %¶Ï¿ªÒ©ÍèÄÚ²¿ÓëÒ©°åµÄÕ³Á¬
+se4 = strel('disk',5);  %æ–­å¼€è¯ä¸¸å†…éƒ¨ä¸è¯æ¿çš„ç²˜è¿
 region = imopen(region, se4);
 se5 = strel('disk',3);
-ebw = imerode(bw,se5);  %½«¶şÖµÍ¼Ïñ¸¯Ê´µôÒ»Ğ©±ßÔµÏñËØ
+ebw = imerode(bw,se5);  %å°†äºŒå€¼å›¾åƒè…èš€æ‰ä¸€äº›è¾¹ç¼˜åƒç´ 
 pill = ebw - region;
 pill(pill<0) = 0;
 pill = logical(pill);
 se6 = strel('disk',3);
-pill = imerode(pill,se6);  %ÊÊµ±ËõĞ¡×îÖÕÒ©ÍèÇøÓòµÄ´óĞ¡
+pill = imerode(pill,se6);  %é€‚å½“ç¼©å°æœ€ç»ˆè¯ä¸¸åŒºåŸŸçš„å¤§å°
 imshow(pill);
 imshow(img);
 
 [l,num]=bwlabel(pill,8);
-status = regionprops(l,'BoundingBox');  %%»­Íâ½Ó¾ØĞÎ
+status = regionprops(l,'BoundingBox');  %%ç”»å¤–æ¥çŸ©å½¢
 hold on;
 for i = 1 : num
      rectangle('position',status(i).BoundingBox,'edgecolor','r');
 end 
 hold off;
+
+%åˆ©ç”¨åŒºåŸŸç°åº¦æ–¹å·®åšé—®é¢˜èƒ¶å›Šæ£€æµ‹ï¼Œåªæ ‡å‡ºæ­£å¸¸èƒ¶å›Š
+%hold on;
+%for i = 1 : num
+%     labeled = find(l == i);
+%     if (var(double(gray(labeled))) > 1000)
+%       rectangle('position',status(i).BoundingBox,'edgecolor','r');
+%     end
+%end 
+%hold off;
